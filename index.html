@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
 <meta name="theme-color" content="#0f0f14">
-<title>ERSA KUTU · Müdür</title>
+<title>ERSA KUTU · Kutu Masrafları</title>
 <link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0c0c10;--card:#16161c;--card2:#1a1a20;--line:#26262e;--ink:#fff;--muted:#8b8b93;--red:#E0102B;--green:#2ED573;--gold:#F5A623;--blue:#5B8DEF;--purple:#9B8DFF;--orange:#FF8A65}
@@ -102,7 +102,7 @@ function render(){
 }
 function loginView(){
   return '<div class="login"><div class="logo" style="width:60px;height:60px;border-radius:16px;font-size:26px;margin:0 auto 16px;">K</div>'
-   +'<div style="font-size:22px;font-weight:800;">ERSA KUTU</div><div style="color:var(--muted);font-size:13px;margin-top:4px;">Üretim Müdürü Girişi</div>'
+   +'<div style="font-size:22px;font-weight:800;">ERSA KUTU</div><div style="color:var(--muted);font-size:13px;margin-top:4px;">Kutu Masrafları · Giriş</div>'
    +'<input id="lk" class="field" style="margin-top:24px;text-align:center;" placeholder="Kod"><input id="ls" class="field" type="password" style="margin-top:11px;text-align:center;" placeholder="Şifre">'
    +'<button class="btn" style="margin-top:18px;" data-a="login">Giriş Yap</button></div>';
 }
@@ -119,7 +119,7 @@ function homeView(){
    +'<div class="grid">'+tileHtml+'</div>'
    +'<div class="sec">SON HAREKETLER</div>'+son+'</div>';
 }
-function brand(){return '<div class="logo">K</div><div class="grow"><div class="tt">ERSA KUTU</div><div class="ts">Üretim Müdürü</div></div>';}
+function brand(){return '<div class="logo">K</div><div class="grow"><div class="tt">ERSA KUTU</div><div class="ts">Kutu Masrafları</div></div>';}
 function hrkRow(x){
   var pos=x.tutar>=0; var col=pos?'var(--green)':'var(--red)';
   var bg={Tahsilat:'rgba(46,213,115,.14)',Ödeme:'rgba(224,16,43,.14)',Malzeme:'rgba(245,166,35,.14)',Atölye:'rgba(155,141,255,.14)','Maaş':'rgba(46,213,115,.14)','Yövmiye':'rgba(255,138,101,.14)','Nakit Giriş':'rgba(46,213,115,.14)','Nakit Çıkış':'rgba(224,16,43,.14)'}[x.kategori]||'#22222a';
