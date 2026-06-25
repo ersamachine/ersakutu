@@ -49,8 +49,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .opt{flex:1;text-align:center;padding:11px;border-radius:11px;background:#0d0d11;border:1px solid var(--line);font-weight:700;font-size:13px;cursor:pointer;color:var(--muted)}
 .opt.on{background:var(--red);color:#fff;border-color:var(--red)}
 .opt.on.g{background:var(--green);border-color:var(--green)}
-.ovl{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;z-index:40}
-.sheet{background:#121217;width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom) + 18px);max-height:92vh;overflow:auto}
+.ovl{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;z-index:40}
+.bd{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.sheet{position:relative;background:#121217;width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom) + 18px);max-height:92vh;overflow:auto}
 .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .shx{width:30px;height:30px;border-radius:50%;background:#2a2a30;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .strip{display:flex;gap:8px;flex-wrap:wrap}
@@ -108,8 +109,8 @@ function loginView(){
 function homeView(){
   var d=S.data,o=(d&&d.ozet)||{};
   if(!d) return '<div class="top">'+brand()+'</div><div class="empty">Yükleniyor…</div>';
-  var tiles=[["users","Cari\\nHesaplar","blue","cari"],["box","Malzeme\\nGideri","gold","g_Malzeme"],["tools","Atölye\\nGideri","purple","g_Atölye"],["wallet","Maaş","green","g_Maaş"],["cal","Yövmiye","orange","g_Yövmiye"],["cash","Kasa\\nHareket","red","kasa"]];
-  var tileHtml=tiles.map(function(t){return '<div class="tile" data-a="go" data-v="'+t[3]+'">'+ic(IC[t[0]],22,'var(--'+t[2]+')')+'<div>'+t[1].replace("\\n","<br>")+'</div></div>';}).join("");
+  var tiles=[["users","Cari\\nHesaplar","blue","go","cari"],["box","Masraf\\nGir","gold","open","gider"],["cash","Kasa\\nHareket","red","go","kasa"]];
+  var tileHtml=tiles.map(function(t){return '<div class="tile" data-a="'+t[3]+'" data-v="'+t[4]+'">'+ic(IC[t[0]],22,'var(--'+t[2]+')')+'<div>'+t[1].replace("\\n","<br>")+'</div></div>';}).join("");
   var son=(d.sonHareketler||[]).slice(0,8).map(function(x){return hrkRow(x);}).join("")||'<div class="empty">Henüz hareket yok.</div>';
   return '<div class="top">'+brand()+'<div style="position:relative;">'+ic(IC.bell,21,'var(--muted)')+(o.bekleyen?'<span style="position:absolute;top:-5px;right:-5px;background:var(--gold);color:#000;font-size:9px;font-weight:800;min-width:15px;height:15px;border-radius:8px;display:flex;align-items:center;justify-content:center;">'+o.bekleyen+'</span>':'')+'</div></div>'
    +'<div class="pad"><div class="kasa"><div class="kl">KASA BAKİYESİ</div><div class="kv">'+tl(o.kasa)+'</div>'
@@ -153,15 +154,16 @@ function sheetView(){
     +'<label class="lbl">Açıklama (opsiyonel)</label><input id="f_ack" class="field" placeholder="not">'
     +fotoBlok()
     +'<button class="btn '+(yon==="Giriş"?"btn2":"")+'" style="margin-top:16px;" data-a="hareketKaydet">Kaydet (onaya gider)</button>'); }
-  if(t&&t.indexOf("gider_")===0){ var kat=t.slice(6);
-    var altLbl=(kat==="Maaş"?"Kişi (kimin maaşı)":(kat==="Yövmiye"?"Açıklama / işçiler":(kat==="Malzeme"?"Tedarikçi":"Açıklama")));
-    return wrap(kat+" Gideri",
-    (kat==="Yövmiye"?'<label class="lbl">İşçi sayısı</label><input id="f_adet" class="field" inputmode="numeric" placeholder="örn. 3">':'')
-    +'<label class="lbl">'+(kat==="Yövmiye"?"Toplam tutar (₺)":"Tutar (₺)")+'</label><input id="f_tut" class="field" inputmode="decimal" placeholder="0">'
-    +'<label class="lbl">'+altLbl+'</label><input id="f_alt" class="field" placeholder="'+altLbl+'">'
+  if(t==="gider"){ var kats=(S.data&&S.data.kategoriler)||["Malzeme","Atölye","Maaş","Yövmiye"];
+    var opts=kats.map(function(k){return '<option>'+esc(k)+'</option>';}).join("")+'<option value="__new__">+ Yeni masraf kalemi…</option>';
+    return wrap("Masraf / Gider Gir",
+    '<label class="lbl">Masraf kalemi</label><select id="f_kat" class="field" onchange="katChange()">'+opts+'</select>'
+    +'<input id="f_katyeni" class="field" style="display:none;margin-top:8px;" placeholder="Yeni kalem adı (örn. Elektrik, Kira, Nakliye)">'
+    +'<label class="lbl">Tutar (₺)</label><input id="f_tut" class="field" inputmode="decimal" placeholder="0">'
+    +'<label class="lbl">İlgili — tedarikçi / kişi (opsiyonel)</label><input id="f_alt" class="field" placeholder="örn. Ünal Kağıt / Ahmet">'
     +'<label class="lbl">Açıklama (opsiyonel)</label><input id="f_ack" class="field" placeholder="not">'
     +fotoBlok()
-    +'<button class="btn" style="margin-top:16px;" data-a="giderKaydet" data-v="'+esc(kat)+'">Kaydet (onaya gider)</button>'); }
+    +'<button class="btn" style="margin-top:16px;" data-a="giderKaydet">Kaydet (onaya gider)</button>'); }
   if(t==="kasaEkle"){ var ky=(S.sd&&S.sd.yon)||"Giriş";
     return wrap("Kasa Hareketi",
     '<div class="seg"><div class="opt '+(ky==="Giriş"?"on g":"")+'" data-a="kyon" data-v="Giriş">Nakit Giriş</div><div class="opt '+(ky==="Çıkış"?"on":"")+'" data-a="kyon" data-v="Çıkış">Nakit Çıkış</div></div>'
@@ -170,17 +172,18 @@ function sheetView(){
     +'<button class="btn '+(ky==="Giriş"?"btn2":"")+'" style="margin-top:16px;" data-a="kasaKaydet">Kaydet (onaya gider)</button>'); }
   return "";
 }
-function wrap(title,inner){ return '<div class="ovl" data-a="close"><div class="sheet" onclick="event.stopPropagation()"><div class="sh"><div style="font-size:17px;font-weight:800;">'+title+'</div><div class="shx" data-a="close">'+ic(IC.x,16,'#ccc')+'</div></div>'+inner+'</div></div>'; }
+function wrap(title,inner){ return '<div class="ovl"><div class="bd" data-a="close"></div><div class="sheet"><div class="sh"><div style="font-size:17px;font-weight:800;">'+title+'</div><div class="shx" data-a="close">'+ic(IC.x,16,'#ccc')+'</div></div>'+inner+'</div></div>'; }
 function fotoBlok(){ var th=PHOTOS.map(function(p){return '<div class="thumb" style="background-image:url('+p+')"></div>';}).join(""); return '<label class="lbl">Fiş / belge fotoğrafı (opsiyonel)</label><div id="strip" class="strip">'+th+'<label class="add" onclick="document.getElementById(\'photofile\').click()">'+ic(IC.cam,18,'#888')+'</label></div>'; }
 window.pickPhotos=function(e){ var strip=$("strip"); Array.prototype.forEach.call(e.target.files,function(f){ if(PHOTOS.length>=4)return; var rd=new FileReader(); rd.onload=function(){ var img=new Image(); img.onload=function(){ var mx=1300,w=img.width,h=img.height; if(w>mx||h>mx){if(w>=h){h=Math.round(h*mx/w);w=mx;}else{w=Math.round(w*mx/h);h=mx;}} var cv=document.createElement("canvas");cv.width=w;cv.height=h;cv.getContext("2d").drawImage(img,0,0,w,h); var data=cv.toDataURL("image/jpeg",0.6); PHOTOS.push(data); if(strip){var t=document.createElement("div");t.className="thumb";t.style.backgroundImage="url("+data+")";strip.insertBefore(t,strip.querySelector(".add"));} }; img.src=rd.result; }; rd.readAsDataURL(f); }); e.target.value=""; };
 
+window.katChange=function(){ var s=document.getElementById("f_kat"),y=document.getElementById("f_katyeni"); if(!s||!y)return; var n=(s.value==="__new__"); y.style.display=n?"block":"none"; if(n)setTimeout(function(){y.focus();},50); };
 /* ---------- events ---------- */
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-a]"); if(!el)return;
   var a=el.getAttribute("data-a"), v=el.getAttribute("data-v");
   if(a==="login"){ var k=$("lk").value.trim(),s=$("ls").value.trim(); if(!k||!s){toast("Kod ve şifre girin");return;} localStorage.kutuKod=k;localStorage.kutuSifre=s; el.textContent="Giriş yapılıyor…"; api("data").then(function(j){ if(j&&j.ok){S.authed=true;S.data=j;render();} else {toast((j&&j.error)||"Giriş başarısız");localStorage.removeItem("kutuKod");render();} }).catch(function(){toast("Bağlantı hatası");render();}); return; }
   if(a==="go"){ S.screen=v; S.sheet=null; render(); if(v==="home")load(true); return; }
-  if(a==="open"){ PHOTOS=[]; S.sheet=v; S.sd=null; render(); return; }
+  if(a==="open"){ PHOTOS=[]; S.sheet=v; S.sd=null; if(v==="cariEkle")S.tip="Müşteri"; render(); return; }
   if(a==="close"){ S.sheet=null; S.sd=null; render(); return; }
   if(a==="tip"){ document.getElementById("tipM").classList.toggle("on",v==="Müşteri"); document.getElementById("tipM").classList.toggle("g",v==="Müşteri"); document.getElementById("tipT").classList.toggle("on",v==="Tedarikçi"); S.tip=v; return; }
   if(a==="cariAc"){ PHOTOS=[]; S.sheet="hareket"; S.sd={cari:v,yon:"Giriş"}; render(); return; }
@@ -188,7 +191,7 @@ document.addEventListener("click",function(e){
   if(a==="kyon"){ S.sd=S.sd||{}; S.sd.yon=v; render(); return; }
   if(a==="cariKaydet"){ var ad=$("f_ad").value.trim(); if(!ad){toast("Ad girin");return;} send(el,"cariEkle",{ad:ad,tip:S.tip||"Müşteri",tel:$("f_tel").value.trim()},"cari"); return; }
   if(a==="hareketKaydet"){ var tut=$("f_tut").value; if(!(parseFloat(String(tut).replace(",","."))>0)){toast("Tutar girin");return;} send(el,"hareketEkle",{cari:S.sd.cari,yon:S.sd.yon,tutar:tut,yontem:$("f_yon").value.trim(),aciklama:$("f_ack").value.trim(),photos:PHOTOS.slice()},"cari"); return; }
-  if(a==="giderKaydet"){ var tt=$("f_tut").value; if(!(parseFloat(String(tt).replace(",","."))>0)){toast("Tutar girin");return;} var data={kategori:v,tutar:tt,alt:($("f_alt")?$("f_alt").value.trim():""),aciklama:$("f_ack").value.trim(),adet:($("f_adet")?$("f_adet").value:""),photos:PHOTOS.slice()}; send(el,"giderEkle",data,"home"); return; }
+  if(a==="giderKaydet"){ var sel=$("f_kat").value; var kat=(sel==="__new__")?($("f_katyeni").value.trim()):sel; if(!kat){toast("Masraf kalemi seçin veya yazın");return;} var tt=$("f_tut").value; if(!(parseFloat(String(tt).replace(",","."))>0)){toast("Tutar girin");return;} send(el,"giderEkle",{kategori:kat,tutar:tt,alt:$("f_alt").value.trim(),aciklama:$("f_ack").value.trim(),photos:PHOTOS.slice()},"home"); return; }
   if(a==="kasaKaydet"){ var kt=$("f_tut").value; if(!(parseFloat(String(kt).replace(",","."))>0)){toast("Tutar girin");return;} send(el,"kasaEkle",{yon:(S.sd&&S.sd.yon)||"Giriş",tutar:kt,aciklama:$("f_ack").value.trim()},"kasa"); return; }
 });
 function send(btn,action,data,goScreen){
