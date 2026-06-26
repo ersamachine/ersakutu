@@ -144,6 +144,7 @@ function render(){
   var h="";
   if(S.screen==="home") h=homeView();
   else if(S.screen==="cari") h=cariView();
+  else if(S.screen==="cariDetay") h=cariDetayView();
   else if(S.screen==="masraflar") h=masraflarView();
   else if(S.screen==="hesabim") h=hesabimView();
   else if(S.screen==="kasa") h=kasaListView();
@@ -155,7 +156,7 @@ function render(){
 }
 function navBar(){
   var t=[["home","Anasayfa","home"],["cari","Cari","users"],["masraflar","Masraflar","biz"],["hesabim","Hesabım","user"]];
-  return '<div class="bnav">'+t.map(function(x){ var on=(S.screen===x[0])||(x[0]==="hesabim"&&(S.screen==="kasa"||S.screen==="bekleyen")); var c=on?'var(--red)':'#6e6e76'; return '<div data-a="go" data-v="'+x[0]+'">'+ic(IC[x[2]],21,c)+'<div class="lab" style="color:'+c+';'+(on?'font-weight:700;':'')+'">'+x[1]+'</div></div>'; }).join("")+'</div>';
+  return '<div class="bnav">'+t.map(function(x){ var on=(S.screen===x[0])||(x[0]==="cari"&&S.screen==="cariDetay")||(x[0]==="hesabim"&&(S.screen==="kasa"||S.screen==="bekleyen")); var c=on?'var(--red)':'#6e6e76'; return '<div data-a="go" data-v="'+x[0]+'">'+ic(IC[x[2]],21,c)+'<div class="lab" style="color:'+c+';'+(on?'font-weight:700;':'')+'">'+x[1]+'</div></div>'; }).join("")+'</div>';
 }
 function loginView(){
   return '<div class="login"><div class="logo" style="width:60px;height:60px;border-radius:16px;font-size:26px;margin:0 auto 16px;">K</div>'
@@ -177,8 +178,21 @@ function homeView(){
 }
 function cariView(){
   var d=S.data; var list=(d&&d.cariler)||[];
-  var rows=list.map(function(c){var pos=c.bakiye>=0;return '<div class="row" data-a="cariAc" data-v="'+esc(c.ad)+'"><div class="ic" style="background:rgba(91,141,239,.14);">'+ic(IC.users,17,'var(--blue)')+'</div><div class="grow"><div class="nm">'+esc(c.ad)+'</div><div class="sub">'+esc(c.tip)+(c.tel?' · '+esc(c.tel):'')+'</div></div><div class="amt" style="color:'+(pos?'var(--green)':'var(--red)')+';">'+tls(c.bakiye)+'</div></div>';}).join("")||'<div class="empty">Cari hesap yok. Aşağıdan ekle.</div>';
-  return '<div class="pad" style="padding-top:calc(env(safe-area-inset-top) + 14px);"><div style="font-size:20px;font-weight:800;margin-bottom:3px;">Cari Hesaplar</div><div style="color:var(--muted);font-size:12px;margin-bottom:14px;">Dokun → tahsilat / ödeme gir</div>'+rows+'</div><div class="fab"><button class="btn" data-a="open" data-v="cariEkle">'+ic(IC.plus,16)+' Yeni Cari Ekle</button></div>';
+  var rows=list.map(function(c){var pos=c.bakiye>=0;return '<div class="row" data-a="cariDetay" data-v="'+esc(c.ad)+'"><div class="ic" style="background:rgba(91,141,239,.14);">'+ic(IC.users,17,'var(--blue)')+'</div><div class="grow"><div class="nm">'+esc(c.ad)+'</div><div class="sub">'+esc(c.tip)+(c.tel?' · '+esc(c.tel):'')+'</div></div><div style="text-align:right;"><div class="amt" style="color:'+(pos?'var(--green)':'var(--red)')+';">'+tls(c.bakiye)+'</div></div><span style="margin-left:3px;flex-shrink:0;">'+ic(IC.chev,15,'#5a5a63')+'</span></div>';}).join("")||'<div class="empty">Cari hesap yok. Aşağıdan ekle.</div>';
+  return '<div class="pad" style="padding-top:calc(env(safe-area-inset-top) + 14px);"><div style="font-size:20px;font-weight:800;margin-bottom:3px;">Cari Hesaplar</div><div style="color:var(--muted);font-size:12px;margin-bottom:14px;">Dokun → hareketler / ekstre · giriş-çıkış</div>'+rows+'</div><div class="fab"><button class="btn" data-a="open" data-v="cariEkle">'+ic(IC.plus,16)+' Yeni Cari Ekle</button></div>';
+}
+function cariDetayView(){
+  var d=S.data; var ad=S.cariSel||"";
+  var c=((d&&d.cariler)||[]).filter(function(x){return x.ad===ad;})[0]||{ad:ad,bakiye:0,tip:"",tel:""};
+  var hrk=movements().filter(function(m){return m.tip==="hareket" && m.rec && m.rec.cari===ad;});
+  var rows=hrk.map(movRow).join("")||'<div class="empty">Bu cariye ait hareket yok. Yukarıdan giriş/çıkış ekle.</div>';
+  var pos=c.bakiye>=0;
+  return '<div class="pad" style="padding-top:calc(env(safe-area-inset-top) + 14px);">'
+   +'<div class="back" data-a="go" data-v="cari">'+ic(IC.cl,18,'var(--muted)')+' Cari Hesaplar</div>'
+   +'<div style="font-size:20px;font-weight:800;">'+esc(c.ad)+'</div><div style="color:var(--muted);font-size:12px;margin-bottom:13px;">'+esc(c.tip||"Cari")+(c.tel?' · '+esc(c.tel):'')+'</div>'
+   +'<div class="kasa" style="margin-bottom:14px;"><div class="kl">GÜNCEL BAKİYE</div><div class="kv" style="color:'+(pos?'var(--green)':'var(--red)')+';">'+tls(c.bakiye)+'</div><div style="font-size:10.5px;color:var(--muted);margin-top:3px;">'+hrk.length+' hareket</div></div>'
+   +'<div class="seg" style="margin-bottom:16px;"><div class="opt on g" data-a="cariHrkAc" data-v="Giriş">Giriş (tahsilat)</div><div class="opt" data-a="cariHrkAc" data-v="Çıkış">Çıkış (ödeme)</div></div>'
+   +'<div class="sec" style="margin:0 4px 8px;">HAREKETLER · dokun → düzelt</div>'+rows+'</div>';
 }
 function masraflarView(){
   var all=movements(); var months=[],seen={};
@@ -276,6 +290,8 @@ document.addEventListener("click",function(e){
   if(a==="close"){ S.sheet=null; S.sd=null; render(); return; }
   if(a==="tip"){ document.getElementById("tipM").classList.toggle("on",v==="Müşteri"); document.getElementById("tipM").classList.toggle("g",v==="Müşteri"); document.getElementById("tipT").classList.toggle("on",v==="Tedarikçi"); S.tip=v; return; }
   if(a==="cariAc"){ PHOTOS=[]; S.sheet="hareket"; S.sd={cari:v,yon:"Giriş"}; render(); return; }
+  if(a==="cariDetay"){ S.cariSel=v; S.screen="cariDetay"; S.sheet=null; S.sd=null; render(); return; }
+  if(a==="cariHrkAc"){ PHOTOS=[]; S.sheet="hareket"; S.sd={cari:S.cariSel,yon:v}; render(); return; }
   if(a==="hyon"){ S.sd=S.sd||{}; S.sd.yon=v; render(); return; }
   if(a==="kyon"){ S.sd=S.sd||{}; S.sd.yon=v; render(); return; }
   if(a==="aySec"){ S.ay=v; render(); return; }
@@ -283,7 +299,7 @@ document.addEventListener("click",function(e){
   if(a==="logout"){ if(!confirm("Çıkış yapılsın mı?"))return; localStorage.removeItem("kutuKod"); localStorage.removeItem("kutuSifre"); S.authed=false; S.data=null; S.screen="home"; render(); return; }
   if(a==="edit"){ var tip=el.getAttribute("data-tip"), id=el.getAttribute("data-id"); var arr=tip==="gider"?(S.data&&S.data.giderler):tip==="hareket"?(S.data&&S.data.hareketler):(S.data&&S.data.kasaHrk); var rec=(arr||[]).filter(function(x){return String(x.id)===String(id);})[0]; if(!rec){toast("Kayıt bulunamadı");return;} PHOTOS=[]; if(tip==="gider"){S.sheet="gider";S.sd={edit:rec};} else if(tip==="hareket"){S.sheet="hareket";S.sd={edit:rec,yon:rec.yon,cari:rec.cari};} else {S.sheet="kasaEkle";S.sd={edit:rec,yon:rec.yon};} render(); return; }
   if(a==="cariKaydet"){ var ad=$("f_ad").value.trim(); if(!ad){toast("Ad girin");return;} send(el,"cariEkle",{ad:ad,tip:S.tip||"Müşteri",tel:$("f_tel").value.trim()},"cari"); return; }
-  if(a==="hareketKaydet"){ var tut=$("f_tut").value; if(!(parseFloat(String(tut).replace(",","."))>0)){toast("Tutar girin");return;} send(el,"hareketEkle",{cari:S.sd.cari,yon:S.sd.yon,tutar:tut,tarih:($("f_tar")?$("f_tar").value:""),yontem:$("f_yon").value.trim(),aciklama:$("f_ack").value.trim(),photos:PHOTOS.slice()},"cari"); return; }
+  if(a==="hareketKaydet"){ var tut=$("f_tut").value; if(!(parseFloat(String(tut).replace(",","."))>0)){toast("Tutar girin");return;} send(el,"hareketEkle",{cari:S.sd.cari,yon:S.sd.yon,tutar:tut,tarih:($("f_tar")?$("f_tar").value:""),yontem:$("f_yon").value.trim(),aciklama:$("f_ack").value.trim(),photos:PHOTOS.slice()},(S.cariSel?"cariDetay":"cari")); return; }
   if(a==="hareketGuncelle"){ var tt=$("f_tut").value; if(!(parseFloat(String(tt).replace(",","."))>0)){toast("Tutar girin");return;} send(el,"hareketGuncelle",{id:el.getAttribute("data-id"),yon:(S.sd&&S.sd.yon)||"Giriş",tutar:tt,tarih:($("f_tar")?$("f_tar").value:""),yontem:$("f_yon").value.trim(),aciklama:$("f_ack").value.trim()},S.screen,"Güncellendi · tekrar onaya gönderildi ✓"); return; }
   if(a==="hareketSil"){ if(!confirm("Bu cari hareketi silinsin mi?"))return; send(el,"hareketSil",{id:el.getAttribute("data-id")},S.screen,"Kayıt silindi"); return; }
   if(a==="giderKaydet"){ var sel=$("f_kat").value; var kat=(sel==="__new__")?($("f_katyeni").value.trim()):sel; if(!kat){toast("Masraf kalemi seçin veya yazın");return;} var tg=$("f_tut").value; if(!(parseFloat(String(tg).replace(",","."))>0)){toast("Tutar girin");return;} send(el,"giderEkle",{kategori:kat,tutar:tg,tarih:($("f_tar")?$("f_tar").value:""),alt:$("f_alt").value.trim(),aciklama:$("f_ack").value.trim(),photos:PHOTOS.slice()},"home"); return; }
