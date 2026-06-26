@@ -147,6 +147,7 @@ function render(){
   else if(S.screen==="masraflar") h=masraflarView();
   else if(S.screen==="hesabim") h=hesabimView();
   else if(S.screen==="kasa") h=kasaListView();
+  else if(S.screen==="bekleyen") h=bekleyenView();
   else h=homeView();
   h+=navBar();
   $("app").innerHTML=h;
@@ -154,7 +155,7 @@ function render(){
 }
 function navBar(){
   var t=[["home","Anasayfa","home"],["cari","Cari","users"],["masraflar","Masraflar","biz"],["hesabim","Hesabım","user"]];
-  return '<div class="bnav">'+t.map(function(x){ var on=(S.screen===x[0])||(x[0]==="masraflar"&&S.screen==="kasa"); var c=on?'var(--red)':'#6e6e76'; return '<div data-a="go" data-v="'+x[0]+'">'+ic(IC[x[2]],21,c)+'<div class="lab" style="color:'+c+';'+(on?'font-weight:700;':'')+'">'+x[1]+'</div></div>'; }).join("")+'</div>';
+  return '<div class="bnav">'+t.map(function(x){ var on=(S.screen===x[0])||(x[0]==="hesabim"&&(S.screen==="kasa"||S.screen==="bekleyen")); var c=on?'var(--red)':'#6e6e76'; return '<div data-a="go" data-v="'+x[0]+'">'+ic(IC[x[2]],21,c)+'<div class="lab" style="color:'+c+';'+(on?'font-weight:700;':'')+'">'+x[1]+'</div></div>'; }).join("")+'</div>';
 }
 function loginView(){
   return '<div class="login"><div class="logo" style="width:60px;height:60px;border-radius:16px;font-size:26px;margin:0 auto 16px;">K</div>'
@@ -200,7 +201,7 @@ function hesabimView(){
   function r(icn,col,bg,nm,sub,act,rt){ return '<div class="row"'+(act?' data-a="'+act+'"'+(act==="go"?' data-v="kasa"':''):'')+'><div class="ic" style="background:'+bg+';">'+ic(IC[icn],17,col)+'</div><div class="grow"><div class="nm">'+nm+'</div>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div>'+(rt||'')+'</div>'; }
   return '<div class="pad" style="padding-top:calc(env(safe-area-inset-top) + 16px);">'
    +'<div style="text-align:center;margin-bottom:16px;"><div class="logo" style="width:54px;height:54px;border-radius:16px;font-size:24px;margin:0 auto 8px;">K</div><div style="font-weight:800;font-size:16px;">Kutu Müdürü</div><div style="color:var(--muted);font-size:12px;">ERSA KUTU şubesi</div></div>'
-   +r("clock","var(--gold)","rgba(245,166,35,.14)","Onay bekleyen","Patron panelden onaylıyor","", '<b style="color:var(--gold);">'+(o.bekleyen||0)+'</b>')
+   +'<div class="row" data-a="go" data-v="bekleyen"><div class="ic" style="background:rgba(245,166,35,.14);">'+ic(IC.clock,17,'var(--gold)')+'</div><div class="grow"><div class="nm">Onay bekleyen</div><div class="sub">Onay bekleniyor · dokun → düzelt</div></div><b style="color:var(--gold);margin-right:8px;">'+(o.bekleyen||0)+'</b><span style="flex-shrink:0;">'+ic(IC.chev,16,'#5a5a63')+'</span></div>'
    +r("cash","var(--green)","rgba(46,213,115,.14)","Kasa hareketleri","Güncel: "+tl(o.kasa),"go", '<span style="flex-shrink:0;">'+ic(IC.chev,16,'#5a5a63')+'</span>')
    +'<div class="row" data-a="open" data-v="katYonet"><div class="ic" style="background:rgba(91,141,239,.14);">'+ic(IC.tag,17,'var(--blue)')+'</div><div class="grow"><div class="nm">Masraf kalemleri</div><div class="sub">'+kats.length+' kalem</div></div><span style="flex-shrink:0;">'+ic(IC.chev,16,'#5a5a63')+'</span></div>'
    +'<div class="row" data-a="reloadBtn"><div class="ic" style="background:rgba(46,213,115,.14);">'+ic(IC.refresh,17,'var(--green)')+'</div><div class="grow"><div class="nm">Yenile</div></div></div>'
@@ -211,6 +212,11 @@ function kasaListView(){
   var o=(S.data&&S.data.ozet)||{}; var ks=movements().filter(function(m){return m.tip==="kasa";});
   var rows=ks.map(movRow).join("")||'<div class="empty">Kasa hareketi yok.</div>';
   return '<div class="pad" style="padding-top:calc(env(safe-area-inset-top) + 14px);"><div class="back" data-a="go" data-v="hesabim">'+ic(IC.cl,18,'var(--muted)')+' Hesabım</div><div style="font-size:20px;font-weight:800;">Kasa Hareketleri</div><div class="kasa" style="margin:12px 0 16px;"><div class="kl">GÜNCEL KASA</div><div class="kv">'+tl(o.kasa)+'</div></div>'+rows+'</div><div class="fab"><button class="btn" data-a="open" data-v="kasaEkle">'+ic(IC.plus,16)+' Kasa Giriş / Çıkış</button></div>';
+}
+function bekleyenView(){
+  var bek=movements().filter(function(m){return m.durum==="Onay Bekliyor";});
+  var rows=bek.map(movRow).join("")||'<div class="empty">Onay bekleyen kayıt yok. Hepsi onaylanmış 👍</div>';
+  return '<div class="pad" style="padding-top:calc(env(safe-area-inset-top) + 14px);"><div class="back" data-a="go" data-v="hesabim">'+ic(IC.cl,18,'var(--muted)')+' Hesabım</div><div style="font-size:20px;font-weight:800;">Onay Bekleyenler</div><div style="color:var(--muted);font-size:12px;margin:2px 0 14px;">'+bek.length+' kayıt · patron onaylayana kadar düzeltebilir/silebilirsin · dokun → düzelt</div>'+rows+'</div>';
 }
 /* ---------- sheets ---------- */
 function sheetView(){
