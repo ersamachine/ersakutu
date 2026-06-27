@@ -140,7 +140,7 @@ function movRow(m){
   var odTxt=(m.rec&&m.rec.odeme==="Ödeme Yapıldı")?"ÖDEME YAPILDI":(m.rec&&m.rec.odeme==="Ödendi"?"ÖDENDİ":"ÖDEME BEKLİYOR");
   var odBadge=(m.tip==="gider")?(odBek?'<span style="display:inline-flex;align-items:center;gap:3px;font-size:8.5px;font-weight:800;padding:2px 7px;border-radius:20px;background:rgba(245,166,35,.18);color:var(--gold);margin-top:3px;">'+ic(IC.clock,10,'#F5A623')+odTxt+'</span>':'<span style="display:inline-flex;align-items:center;gap:3px;font-size:8.5px;font-weight:800;padding:2px 7px;border-radius:20px;background:rgba(46,213,115,.16);color:var(--green);margin-top:3px;">'+ic(IC.cash,10,'#2ED573')+odTxt+'</span>'):'';
   var sek=(m.tip==="gider"&&m.rec&&m.rec.sekil)?'<span style="display:inline-flex;align-items:center;gap:3px;font-size:8.5px;font-weight:700;padding:2px 7px;border-radius:20px;'+(m.rec.sekil==="Elden"?'background:rgba(46,213,115,.14);color:var(--green)':'background:rgba(91,141,239,.16);color:var(--blue)')+';margin-top:3px;margin-left:5px;">'+ic(m.rec.sekil==="Elden"?IC.cash:IC.wallet,10,m.rec.sekil==="Elden"?'#2ED573':'#5B8DEF')+esc(m.rec.sekil)+'</span>':'';
-  return '<div class="row" data-a="edit" data-tip="'+m.tip+'" data-id="'+esc(m.id)+'"'+(odBek?' style="border:1px solid #3a2a18;"':'')+'><div class="ic" style="background:'+cs.bg+';">'+ic(IC[cs.icn],17,cs.icc)+'</div><div class="grow"><div class="nm">'+esc(m.ad||m.kategori)+'</div><div class="sub">'+esc(m.kategori)+' · '+trDate(m.zaman)+'</div>'+odBadge+sek+'</div><div style="text-align:right;"><div class="amt" style="color:'+col+';">'+tls(m.tutar)+'</div>'+(m.durum==="Onay Bekliyor"?'<span class="pill p-b">Bekliyor</span>':'<span class="pill p-o">Onaylı</span>')+'</div><span style="margin-left:2px;flex-shrink:0;">'+ic(IC.pencil,15,'#5a5a63')+'</span></div>';
+  return '<div class="row"'+(odBek?' style="border:1px solid #3a2a18;"':'')+'><div class="ic" style="background:'+cs.bg+';">'+ic(IC[cs.icn],17,cs.icc)+'</div><div class="grow"><div class="nm">'+esc(m.ad||m.kategori)+'</div><div class="sub">'+esc(m.kategori)+' · '+trDate(m.zaman)+'</div>'+odBadge+sek+'</div><div style="text-align:right;"><div class="amt" style="color:'+col+';">'+tls(m.tutar)+'</div>'+(m.durum==="Onay Bekliyor"?'<span class="pill p-b">Bekliyor</span>':'<span class="pill p-o">Onaylı</span>')+'</div></div>';
 }
 
 /* ---------- render ---------- */
@@ -180,7 +180,7 @@ function homeView(){
    +(o.bekleyen?'<div style="font-size:11px;color:var(--gold);font-weight:600;margin:11px 4px 0;">'+ic(IC.bell,12,'var(--gold)')+' '+o.bekleyen+' kayıt patron onayı bekliyor</div>':'')
    +(o.odenmemisMasrafAdet?'<div data-a="go" data-v="masraflar" style="display:flex;align-items:center;gap:10px;background:rgba(245,166,35,.1);border:1px solid #3a2a18;border-radius:13px;padding:11px 13px;margin-top:11px;cursor:pointer;"><div style="width:30px;height:30px;border-radius:9px;background:rgba(245,166,35,.16);display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+ic(IC.clock,17,'var(--gold)')+'</div><div style="flex:1;"><div style="font-size:12.5px;font-weight:800;color:var(--gold);">Ödeme bekleyen masraf</div><div style="font-size:11px;color:#caa46b;">'+o.odenmemisMasrafAdet+' kayıt · '+tl(o.odenmemisMasraf)+' (kasadan düşmedi)</div></div>'+ic(IC.chev,16,'#caa46b')+'</div>':'')
    +'<div class="qgrid"><div class="qtile" data-a="open" data-v="gider">'+ic(IC.box,22,'var(--gold)')+'<div>Masraf Gir</div></div><div class="qtile" data-a="open" data-v="kasaEkle">'+ic(IC.cash,22,'var(--red)')+'<div>Kasa Giriş / Çıkış</div></div></div>'
-   +'<div class="sec">SON HAREKETLER · dokun → düzelt</div>'+son+'</div>';
+   +'<div class="sec">SON HAREKETLER</div>'+son+'</div>';
 }
 function cariView(){
   var d=S.data; var list=(d&&d.cariler)||[];
@@ -198,7 +198,7 @@ function cariDetayView(){
    +'<div style="font-size:20px;font-weight:800;">'+esc(c.ad)+'</div><div style="color:var(--muted);font-size:12px;margin-bottom:13px;">'+esc(c.tip||"Cari")+(c.tel?' · '+esc(c.tel):'')+'</div>'
    +'<div class="kasa" style="margin-bottom:14px;"><div class="kl">GÜNCEL BAKİYE</div><div class="kv" style="color:'+(pos?'var(--green)':'var(--red)')+';">'+tls(c.bakiye)+'</div><div style="font-size:10.5px;color:var(--muted);margin-top:3px;">'+hrk.length+' hareket</div></div>'
    +'<div class="seg" style="margin-bottom:16px;"><div class="opt on g" data-a="cariHrkAc" data-v="Giriş">Giriş (tahsilat)</div><div class="opt" data-a="cariHrkAc" data-v="Çıkış">Çıkış (ödeme)</div></div>'
-   +'<div class="sec" style="margin:0 4px 8px;">HAREKETLER · dokun → düzelt</div>'+rows+'</div>';
+   +'<div class="sec" style="margin:0 4px 8px;">HAREKETLER</div>'+rows+'</div>';
 }
 function masraflarView(){
   var all=movements(); var months=[],seen={};
@@ -210,7 +210,7 @@ function masraflarView(){
   var gir=0,cik=0,maas=0;
   inMon.forEach(function(m){ if(m.tutar>=0)gir+=m.tutar; else cik+=-m.tutar; if(m.tip==="gider"&&(m.kategori==="Maaş"||m.kategori==="Yövmiye"))maas+=Math.abs(m.tutar); });
   var rows=inMon.map(movRow).join("")||'<div class="empty">Bu ay hareket yok.</div>';
-  return '<div class="pad" style="padding-top:calc(env(safe-area-inset-top) + 14px);"><div style="font-size:20px;font-weight:800;">Masraflar &amp; Ödemeler</div><div style="color:var(--muted);font-size:12px;margin:2px 0 12px;">Ay seç · toplamları gör · dokun → düzelt</div>'
+  return '<div class="pad" style="padding-top:calc(env(safe-area-inset-top) + 14px);"><div style="font-size:20px;font-weight:800;">Masraflar &amp; Ödemeler</div><div style="color:var(--muted);font-size:12px;margin:2px 0 12px;">Ay seç · toplamları gör</div>'
    +'<div class="chiprow">'+chips+'</div>'
    +'<div class="mtot"><div><small>Bu ay çıkış</small><b style="color:var(--red);">'+tl(cik)+'</b></div><div><small>Maaş + Yövmiye</small><b style="color:var(--gold);">'+tl(maas)+'</b></div></div>'
    +(gir?'<div style="font-size:11.5px;color:var(--green);font-weight:600;margin:-4px 2px 12px;">'+ic(IC.wallet,12,'var(--green)')+' Bu ay giriş / tahsilat: '+tl(gir)+'</div>':'')
@@ -221,7 +221,7 @@ function hesabimView(){
   function r(icn,col,bg,nm,sub,act,rt){ return '<div class="row"'+(act?' data-a="'+act+'"'+(act==="go"?' data-v="kasa"':''):'')+'><div class="ic" style="background:'+bg+';">'+ic(IC[icn],17,col)+'</div><div class="grow"><div class="nm">'+nm+'</div>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div>'+(rt||'')+'</div>'; }
   return '<div class="pad" style="padding-top:calc(env(safe-area-inset-top) + 16px);">'
    +'<div style="text-align:center;margin-bottom:16px;"><div class="logo" style="width:54px;height:54px;border-radius:16px;font-size:24px;margin:0 auto 8px;">K</div><div style="font-weight:800;font-size:16px;">Kutu Müdürü</div><div style="color:var(--muted);font-size:12px;">ERSA KUTU şubesi</div></div>'
-   +'<div class="row" data-a="go" data-v="bekleyen"><div class="ic" style="background:rgba(245,166,35,.14);">'+ic(IC.clock,17,'var(--gold)')+'</div><div class="grow"><div class="nm">Onay bekleyen</div><div class="sub">Onay bekleniyor · dokun → düzelt</div></div><b style="color:var(--gold);margin-right:8px;">'+(o.bekleyen||0)+'</b><span style="flex-shrink:0;">'+ic(IC.chev,16,'#5a5a63')+'</span></div>'
+   +'<div class="row" data-a="go" data-v="bekleyen"><div class="ic" style="background:rgba(245,166,35,.14);">'+ic(IC.clock,17,'var(--gold)')+'</div><div class="grow"><div class="nm">Onay bekleyen</div><div class="sub">Patron onayı bekleniyor</div></div><b style="color:var(--gold);margin-right:8px;">'+(o.bekleyen||0)+'</b><span style="flex-shrink:0;">'+ic(IC.chev,16,'#5a5a63')+'</span></div>'
    +r("cash","var(--green)","rgba(46,213,115,.14)","Kasa hareketleri","Güncel: "+tl(o.kasa),"go", '<span style="flex-shrink:0;">'+ic(IC.chev,16,'#5a5a63')+'</span>')
    +'<div class="row" data-a="open" data-v="katYonet"><div class="ic" style="background:rgba(91,141,239,.14);">'+ic(IC.tag,17,'var(--blue)')+'</div><div class="grow"><div class="nm">Masraf kalemleri</div><div class="sub">'+kats.length+' kalem</div></div><span style="flex-shrink:0;">'+ic(IC.chev,16,'#5a5a63')+'</span></div>'
    +'<div class="row" data-a="reloadBtn"><div class="ic" style="background:rgba(46,213,115,.14);">'+ic(IC.refresh,17,'var(--green)')+'</div><div class="grow"><div class="nm">Yenile</div></div></div>'
@@ -236,57 +236,52 @@ function kasaListView(){
 function bekleyenView(){
   var bek=movements().filter(function(m){return m.durum==="Onay Bekliyor";});
   var rows=bek.map(movRow).join("")||'<div class="empty">Onay bekleyen kayıt yok. Hepsi onaylanmış 👍</div>';
-  return '<div class="pad" style="padding-top:calc(env(safe-area-inset-top) + 14px);"><div class="back" data-a="go" data-v="hesabim">'+ic(IC.cl,18,'var(--muted)')+' Hesabım</div><div style="font-size:20px;font-weight:800;">Onay Bekleyenler</div><div style="color:var(--muted);font-size:12px;margin:2px 0 14px;">'+bek.length+' kayıt · patron onaylayana kadar düzeltebilir/silebilirsin · dokun → düzelt</div>'+rows+'</div>';
+  return '<div class="pad" style="padding-top:calc(env(safe-area-inset-top) + 14px);"><div class="back" data-a="go" data-v="hesabim">'+ic(IC.cl,18,'var(--muted)')+' Hesabım</div><div style="font-size:20px;font-weight:800;">Onay Bekleyenler</div><div style="color:var(--muted);font-size:12px;margin:2px 0 14px;">'+bek.length+' kayıt · patron onayını bekliyor</div>'+rows+'</div>';
 }
 /* ---------- sheets ---------- */
 function sheetView(){
-  var t=S.sheet, ed=S.sd&&S.sd.edit;
+  var t=S.sheet;
   if(t==="cariEkle") return wrap("Yeni Cari Hesap",
     '<label class="lbl">Ad / Firma</label><input id="f_ad" class="field" placeholder="Müşteri veya tedarikçi adı">'
     +'<label class="lbl">Tip</label><div class="seg"><div class="opt on g" data-a="tip" data-v="Müşteri" id="tipM">Müşteri</div><div class="opt" data-a="tip" data-v="Tedarikçi" id="tipT">Tedarikçi</div></div>'
     +'<label class="lbl">Telefon (opsiyonel)</label><input id="f_tel" class="field" inputmode="tel" placeholder="05..">'
     +'<button class="btn" style="margin-top:18px;" data-a="cariKaydet">Kaydet</button>');
-  if(t==="hareket"){ var c=ed?ed.cari:(S.sd&&S.sd.cari); var yon=(S.sd&&S.sd.yon)||(ed?ed.yon:"Giriş");
-    return wrap(esc(c||"Cari")+(ed?" · Düzelt":" · Hareket"),
+  if(t==="hareket"){ var c=(S.sd&&S.sd.cari); var yon=(S.sd&&S.sd.yon)||"Giriş";
+    return wrap(esc(c||"Cari")+" · Hareket",
     '<div class="seg" style="margin-top:2px;"><div class="opt '+(yon==="Giriş"?"on g":"")+'" data-a="hyon" data-v="Giriş">Giriş (tahsilat)</div><div class="opt '+(yon==="Çıkış"?"on":"")+'" data-a="hyon" data-v="Çıkış">Çıkış (ödeme)</div></div>'
-    +'<label class="lbl">Tutar (₺)</label><input id="f_tut" class="field" inputmode="decimal" placeholder="0" value="'+(ed?ed.tutar:"")+'">'
-    +tarihAlani(ed?ed.zaman:"")
-    +'<label class="lbl">Yöntem (opsiyonel)</label><input id="f_yon" class="field" placeholder="Nakit / Havale / Çek" value="'+(ed?esc(ed.yontem):"")+'">'
-    +'<label class="lbl">Açıklama (opsiyonel)</label><input id="f_ack" class="field" placeholder="not" value="'+(ed?esc(ed.aciklama):"")+'">'
-    +(ed?'':fotoBlok())
-    +'<button class="btn '+((ed?yon:yon)==="Giriş"?"btn2":"")+'" style="margin-top:16px;" data-a="'+(ed?"hareketGuncelle":"hareketKaydet")+'"'+(ed?' data-id="'+esc(ed.id)+'"':'')+'>'+(ed?"Güncelle (tekrar onaya gider)":"Kaydet (onaya gider)")+'</button>'
-    +(ed?'<button class="btn btndel" data-a="hareketSil" data-id="'+esc(ed.id)+'">'+ic(IC.trash,15,'var(--red)')+' Kaydı Sil</button>':'')); }
-  if(t==="gider"){ var kats=(S.data&&S.data.kategoriler)||["Malzeme","Atölye","Maaş","Yövmiye"]; var curKat=ed?ed.kategori:"";
-    if(curKat && kats.indexOf(curKat)<0) kats=[curKat].concat(kats);
-    var opts=kats.map(function(k){return '<option'+(k===curKat?' selected':'')+'>'+esc(k)+'</option>';}).join("")+'<option value="__new__">+ Yeni masraf kalemi…</option>';
-    return wrap(ed?"Masrafı Düzelt":"Masraf / Gider Gir",
+    +'<label class="lbl">Tutar (₺)</label><input id="f_tut" class="field" inputmode="decimal" placeholder="0">'
+    +tarihAlani("")
+    +'<label class="lbl">Yöntem (opsiyonel)</label><input id="f_yon" class="field" placeholder="Nakit / Havale / Çek">'
+    +'<label class="lbl">Açıklama (opsiyonel)</label><input id="f_ack" class="field" placeholder="not">'
+    +fotoBlok()
+    +'<button class="btn '+(yon==="Giriş"?"btn2":"")+'" style="margin-top:16px;" data-a="hareketKaydet">Kaydet (onaya gider)</button>'); }
+  if(t==="gider"){ var kats=(S.data&&S.data.kategoriler)||["Malzeme","Atölye","Maaş","Yövmiye"];
+    var opts=kats.map(function(k){return '<option>'+esc(k)+'</option>';}).join("")+'<option value="__new__">+ Yeni masraf kalemi…</option>';
+    return wrap("Masraf / Gider Gir",
     '<label class="lbl">Masraf kalemi</label><select id="f_kat" class="field" onchange="katChange()">'+opts+'</select>'
     +'<input id="f_katyeni" class="field" style="display:none;margin-top:8px;" placeholder="Yeni kalem adı (örn. Elektrik, Kira, Nakliye)">'
-    +'<label class="lbl">Tutar (₺)</label><input id="f_tut" class="field" inputmode="decimal" placeholder="0" value="'+(ed?ed.tutar:"")+'">'
-    +tarihAlani(ed?ed.zaman:"")
-    +'<label class="lbl">İlgili — tedarikçi / kişi (opsiyonel)</label><input id="f_alt" class="field" placeholder="örn. Ünal Kağıt / Ahmet" value="'+(ed?esc(ed.alt):"")+'">'
-    +'<label class="lbl">Açıklama (opsiyonel)</label><input id="f_ack" class="field" placeholder="not" value="'+(ed?esc(ed.aciklama):"")+'">'
+    +'<label class="lbl">Tutar (₺)</label><input id="f_tut" class="field" inputmode="decimal" placeholder="0">'
+    +tarihAlani("")
+    +'<label class="lbl">İlgili — tedarikçi / kişi (opsiyonel)</label><input id="f_alt" class="field" placeholder="örn. Ünal Kağıt / Ahmet">'
+    +'<label class="lbl">Açıklama (opsiyonel)</label><input id="f_ack" class="field" placeholder="not">'
     +(function(){var sk=S.giderSekil||"Hesaptan",hes=(sk==="Hesaptan");
       var seg='<label class="lbl">Ödeme şekli</label><div class="seg"><div class="opt'+(hes?" on":"")+'" data-a="gsekil" data-v="Hesaptan" style="'+(hes?"background:var(--blue);border-color:var(--blue);color:#06203f;":"")+'">'+ic(IC.wallet,14,hes?"#06203f":"#888")+' Hesaptan</div><div class="opt '+(!hes?"on g":"")+'" data-a="gsekil" data-v="Elden">'+ic(IC.cash,14,!hes?"#06351c":"#888")+' Elden</div></div>';
       var fields=hes
-        ? '<label class="lbl">IBAN <span style="color:var(--red);font-weight:700;">*zorunlu</span></label><input id="f_iban" class="field" placeholder="TR.." value="'+(ed?esc(ed.iban):"")+'" style="letter-spacing:.5px;">'
-          +'<label class="lbl">Hesap sahibi / banka (opsiyonel)</label><input id="f_hsahip" class="field" placeholder="örn. Ünal Kağıt — Ziraat" value="'+(ed?esc(ed.hesapSahibi):"")+'">'
-        : '<label class="lbl">Parayı teslim alan <span style="color:var(--red);font-weight:700;">*</span> <span style="color:#5f5f66;">(kasadan kim aldı)</span></label><input id="f_talan" class="field" placeholder="örn. Ahmet (şoför)" value="'+(ed?esc(ed.teslimAlan):"")+'">'
-          +'<label class="lbl">Kime teslim edilecek <span style="color:var(--red);font-weight:700;">*</span> <span style="color:#5f5f66;">(asıl alıcı)</span></label><input id="f_tedilen" class="field" placeholder="örn. Ünal Kağıt" value="'+(ed?esc(ed.teslimEdilen):"")+'">';
+        ? '<label class="lbl">IBAN <span style="color:var(--red);font-weight:700;">*zorunlu</span></label><input id="f_iban" class="field" placeholder="TR.." style="letter-spacing:.5px;">'
+          +'<label class="lbl">Hesap sahibi / banka (opsiyonel)</label><input id="f_hsahip" class="field" placeholder="örn. Ünal Kağıt — Ziraat">'
+        : '<label class="lbl">Parayı teslim alan <span style="color:var(--red);font-weight:700;">*</span> <span style="color:#5f5f66;">(kasadan kim aldı)</span></label><input id="f_talan" class="field" placeholder="örn. Ahmet (şoför)">'
+          +'<label class="lbl">Kime teslim edilecek <span style="color:var(--red);font-weight:700;">*</span> <span style="color:#5f5f66;">(asıl alıcı)</span></label><input id="f_tedilen" class="field" placeholder="örn. Ünal Kağıt">';
       return seg+fields;})()
-    +(function(){var od=ed?(ed.odeme||"Ödeme Bekliyor"):"Ödeme Bekliyor",pa=(od==="Ödendi"||od==="Ödeme Yapıldı");
-      return '<label class="lbl">Durum (otomatik)</label><div style="display:flex;align-items:center;gap:8px;background:'+(pa?'rgba(46,213,115,.12);border:1px solid #1d3a28;':'rgba(245,166,35,.12);border:1px solid #3a2a18;')+'border-radius:11px;padding:11px 13px;">'+ic(pa?IC.cash:IC.clock,16,pa?'#2ED573':'#F5A623')+'<div style="font-size:13px;font-weight:700;color:'+(pa?'var(--green)':'var(--gold)')+';">'+esc(od)+'</div><div style="font-size:10.5px;color:'+(pa?'#7fe0a3':'#caa46b')+';margin-left:auto;">'+(pa?'patron onayladı':'patron onayına gider')+'</div></div><div style="font-size:11px;color:var(--gold);margin-top:6px;">Ödeme yapılana kadar kasadan düşmez; patron panelden onaylayınca düşer.</div>';})()
-    +(ed?'':fotoBlok())
-    +'<button class="btn" style="margin-top:14px;" data-a="'+(ed?"giderGuncelle":"giderKaydet")+'"'+(ed?' data-id="'+esc(ed.id)+'"':'')+'>'+(ed?"Güncelle (tekrar onaya gider)":"Kaydet (onaya gider)")+'</button>'
-    +(ed?'<button class="btn btndel" data-a="giderSil" data-id="'+esc(ed.id)+'">'+ic(IC.trash,15,'var(--red)')+' Kaydı Sil</button>':'')); }
-  if(t==="kasaEkle"){ var ky=(S.sd&&S.sd.yon)||(ed?ed.yon:"Giriş");
-    return wrap(ed?"Kasa Hareketi Düzelt":"Kasa Hareketi",
+    +'<label class="lbl">Durum (otomatik)</label><div style="display:flex;align-items:center;gap:8px;background:rgba(245,166,35,.12);border:1px solid #3a2a18;border-radius:11px;padding:11px 13px;">'+ic(IC.clock,16,'#F5A623')+'<div style="font-size:13px;font-weight:700;color:var(--gold);">Ödeme Bekliyor</div><div style="font-size:10.5px;color:#caa46b;margin-left:auto;">patron onayına gider</div></div><div style="font-size:11px;color:var(--gold);margin-top:6px;">Ödeme yapılana kadar kasadan düşmez; patron panelden onaylayınca düşer.</div>'
+    +fotoBlok()
+    +'<button class="btn" style="margin-top:14px;" data-a="giderKaydet">Kaydet (onaya gider)</button>'); }
+  if(t==="kasaEkle"){ var ky=(S.sd&&S.sd.yon)||"Giriş";
+    return wrap("Kasa Hareketi",
     '<div class="seg"><div class="opt '+(ky==="Giriş"?"on g":"")+'" data-a="kyon" data-v="Giriş">Nakit Giriş</div><div class="opt '+(ky==="Çıkış"?"on":"")+'" data-a="kyon" data-v="Çıkış">Nakit Çıkış</div></div>'
-    +'<label class="lbl">Tutar (₺)</label><input id="f_tut" class="field" inputmode="decimal" placeholder="0" value="'+(ed?ed.tutar:"")+'">'
-    +tarihAlani(ed?ed.zaman:"")
-    +'<label class="lbl">Açıklama</label><input id="f_ack" class="field" placeholder="örn. patron nakit koydu / kasa açığı" value="'+(ed?esc(ed.aciklama):"")+'">'
-    +'<button class="btn '+(ky==="Giriş"?"btn2":"")+'" style="margin-top:16px;" data-a="'+(ed?"kasaGuncelle":"kasaKaydet")+'"'+(ed?' data-id="'+esc(ed.id)+'"':'')+'>'+(ed?"Güncelle (tekrar onaya gider)":"Kaydet (onaya gider)")+'</button>'
-    +(ed?'<button class="btn btndel" data-a="kasaSil" data-id="'+esc(ed.id)+'">'+ic(IC.trash,15,'var(--red)')+' Kaydı Sil</button>':'')); }
+    +'<label class="lbl">Tutar (₺)</label><input id="f_tut" class="field" inputmode="decimal" placeholder="0">'
+    +tarihAlani("")
+    +'<label class="lbl">Açıklama</label><input id="f_ack" class="field" placeholder="örn. patron nakit koydu / kasa açığı">'
+    +'<button class="btn '+(ky==="Giriş"?"btn2":"")+'" style="margin-top:16px;" data-a="kasaKaydet">Kaydet (onaya gider)</button>'); }
   if(t==="katYonet"){ var kk=(S.data&&S.data.kategoriler)||[]; var li=kk.map(function(k){return '<div class="row"><div class="ic" style="background:rgba(91,141,239,.14);">'+ic(IC.tag,16,'var(--blue)')+'</div><div class="grow"><div class="nm">'+esc(k)+'</div></div></div>';}).join("")||'<div class="empty">Kalem yok.</div>';
     return wrap("Masraf Kalemleri",'<div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Yeni kalem, masraf girerken otomatik eklenir.</div>'+li); }
   return "";
@@ -317,18 +312,11 @@ document.addEventListener("click",function(e){
   if(a==="aySec"){ S.ay=v; render(); return; }
   if(a==="reloadBtn"){ load(); toast("Yenileniyor…"); return; }
   if(a==="logout"){ if(!confirm("Çıkış yapılsın mı?"))return; localStorage.removeItem("kutuKod"); localStorage.removeItem("kutuSifre"); S.authed=false; S.data=null; S.screen="home"; render(); return; }
-  if(a==="edit"){ var tip=el.getAttribute("data-tip"), id=el.getAttribute("data-id"); var arr=tip==="gider"?(S.data&&S.data.giderler):tip==="hareket"?(S.data&&S.data.hareketler):(S.data&&S.data.kasaHrk); var rec=(arr||[]).filter(function(x){return String(x.id)===String(id);})[0]; if(!rec){toast("Kayıt bulunamadı");return;} PHOTOS=[]; if(tip==="gider"){S.sheet="gider";S.sd={edit:rec};S.giderSekil=rec.sekil||"Hesaptan";} else if(tip==="hareket"){S.sheet="hareket";S.sd={edit:rec,yon:rec.yon,cari:rec.cari};} else {S.sheet="kasaEkle";S.sd={edit:rec,yon:rec.yon};} render(); return; }
   if(a==="gsekil"){ S.giderSekil=v; render(); return; }
   if(a==="cariKaydet"){ var ad=$("f_ad").value.trim(); if(!ad){toast("Ad girin");return;} send(el,"cariEkle",{ad:ad,tip:S.tip||"Müşteri",tel:$("f_tel").value.trim()},"cari"); return; }
   if(a==="hareketKaydet"){ var tut=$("f_tut").value; if(!(parseFloat(String(tut).replace(",","."))>0)){toast("Tutar girin");return;} send(el,"hareketEkle",{cari:S.sd.cari,yon:S.sd.yon,tutar:tut,tarih:($("f_tar")?$("f_tar").value:""),yontem:$("f_yon").value.trim(),aciklama:$("f_ack").value.trim(),photos:PHOTOS.slice()},(S.cariSel?"cariDetay":"cari")); return; }
-  if(a==="hareketGuncelle"){ var tt=$("f_tut").value; if(!(parseFloat(String(tt).replace(",","."))>0)){toast("Tutar girin");return;} send(el,"hareketGuncelle",{id:el.getAttribute("data-id"),yon:(S.sd&&S.sd.yon)||"Giriş",tutar:tt,tarih:($("f_tar")?$("f_tar").value:""),yontem:$("f_yon").value.trim(),aciklama:$("f_ack").value.trim()},S.screen,"Güncellendi · tekrar onaya gönderildi ✓"); return; }
-  if(a==="hareketSil"){ if(!confirm("Bu cari hareketi silinsin mi?"))return; send(el,"hareketSil",{id:el.getAttribute("data-id")},S.screen,"Kayıt silindi"); return; }
   if(a==="giderKaydet"){ var sel=$("f_kat").value; var kat=(sel==="__new__")?($("f_katyeni").value.trim()):sel; if(!kat){toast("Masraf kalemi seçin veya yazın");return;} var tg=$("f_tut").value; if(!(parseFloat(String(tg).replace(",","."))>0)){toast("Tutar girin");return;} var sk=gSekilTopla(); if(!sk)return; send(el,"giderEkle",{kategori:kat,tutar:tg,tarih:($("f_tar")?$("f_tar").value:""),alt:$("f_alt").value.trim(),aciklama:$("f_ack").value.trim(),sekil:sk.sekil,iban:sk.iban,hesapSahibi:sk.hesapSahibi,teslimAlan:sk.teslimAlan,teslimEdilen:sk.teslimEdilen,photos:PHOTOS.slice()},"home"); return; }
-  if(a==="giderGuncelle"){ var sel2=$("f_kat").value; var kat2=(sel2==="__new__")?($("f_katyeni").value.trim()):sel2; if(!kat2){toast("Masraf kalemi seçin");return;} var tg2=$("f_tut").value; if(!(parseFloat(String(tg2).replace(",","."))>0)){toast("Tutar girin");return;} var sk2=gSekilTopla(); if(!sk2)return; send(el,"giderGuncelle",{id:el.getAttribute("data-id"),kategori:kat2,tutar:tg2,tarih:($("f_tar")?$("f_tar").value:""),alt:$("f_alt").value.trim(),aciklama:$("f_ack").value.trim(),sekil:sk2.sekil,iban:sk2.iban,hesapSahibi:sk2.hesapSahibi,teslimAlan:sk2.teslimAlan,teslimEdilen:sk2.teslimEdilen},S.screen,"Güncellendi · tekrar onaya gönderildi ✓"); return; }
-  if(a==="giderSil"){ if(!confirm("Bu masraf kaydı silinsin mi?"))return; send(el,"giderSil",{id:el.getAttribute("data-id")},S.screen,"Kayıt silindi"); return; }
   if(a==="kasaKaydet"){ var kt=$("f_tut").value; if(!(parseFloat(String(kt).replace(",","."))>0)){toast("Tutar girin");return;} send(el,"kasaEkle",{yon:(S.sd&&S.sd.yon)||"Giriş",tutar:kt,tarih:($("f_tar")?$("f_tar").value:""),aciklama:$("f_ack").value.trim()},"kasa"); return; }
-  if(a==="kasaGuncelle"){ var kt2=$("f_tut").value; if(!(parseFloat(String(kt2).replace(",","."))>0)){toast("Tutar girin");return;} send(el,"kasaGuncelle",{id:el.getAttribute("data-id"),yon:(S.sd&&S.sd.yon)||"Giriş",tutar:kt2,tarih:($("f_tar")?$("f_tar").value:""),aciklama:$("f_ack").value.trim()},S.screen,"Güncellendi · tekrar onaya gönderildi ✓"); return; }
-  if(a==="kasaSil"){ if(!confirm("Bu kasa hareketi silinsin mi?"))return; send(el,"kasaSil",{id:el.getAttribute("data-id")},S.screen,"Kayıt silindi"); return; }
 });
 function send(btn,action,data,goScreen,msg){
   if(S.busy)return; S.busy=true; var old=btn.textContent; btn.textContent="Gönderiliyor…"; btn.style.opacity=".7";
