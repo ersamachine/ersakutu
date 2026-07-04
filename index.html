@@ -109,7 +109,9 @@ chev:'<path d="M9 6l6 6-6 6"/>'};
 function api(action,data){
   return fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({kod:localStorage.kutuKod,sifre:localStorage.kutuSifre,action:action,data:data||{}})}).then(function(r){return r.json();});
 }
-function load(silent){ if(!silent)render(); api("data").then(function(j){ if(j&&j.ok){S.data=j;render();} else if(j&&j.error){toast(j.error); if(/şifre|kod/i.test(j.error)){localStorage.removeItem("kutuKod");S.authed=false;render();}} }).catch(function(){toast("Bağlantı hatası");}); }
+function ekCacheYaz(j){ try{ localStorage.setItem("ek_cache", JSON.stringify(j)); }catch(err){} }
+function ekCacheOku(){ try{ return JSON.parse(localStorage.getItem("ek_cache")||"null"); }catch(err){ return null; } }
+function load(silent){ if(!silent)render(); api("data").then(function(j){ if(j&&j.ok){S.data=j;ekCacheYaz(j);render();} else if(j&&j.error){toast(j.error); if(/şifre|kod/i.test(j.error)){localStorage.removeItem("kutuKod");S.authed=false;render();}} }).catch(function(){toast("Bağlantı hatası");}); }
 
 /* ---------- tarih (Türkçe) ---------- */
 function trDate(z){ z=String(z||""); var d=null; var m=z.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m){ d=new Date(+m[1],+m[2]-1,+m[3]); } else { var t=new Date(z); if(!isNaN(t.getTime())) d=t; } if(!d||isNaN(d.getTime())) return z.slice(0,10); return d.getDate()+" "+TRMON[d.getMonth()]+" "+d.getFullYear(); }
@@ -305,7 +307,7 @@ function gSekilTopla(){ var sk=S.giderSekil||"Hesaptan", o={sekil:sk,iban:"",hes
 document.addEventListener("click",function(e){
   var el=e.target.closest("[data-a]"); if(!el)return;
   var a=el.getAttribute("data-a"), v=el.getAttribute("data-v");
-  if(a==="login"){ var k=$("lk").value.trim(),s=$("ls").value.trim(); if(!k||!s){toast("Kod ve şifre girin");return;} localStorage.kutuKod=k;localStorage.kutuSifre=s; el.textContent="Giriş yapılıyor…"; api("data").then(function(j){ if(j&&j.ok){S.authed=true;S.data=j;render();} else {toast((j&&j.error)||"Giriş başarısız");localStorage.removeItem("kutuKod");render();} }).catch(function(){toast("Bağlantı hatası");render();}); return; }
+  if(a==="login"){ var k=$("lk").value.trim(),s=$("ls").value.trim(); if(!k||!s){toast("Kod ve şifre girin");return;} localStorage.kutuKod=k;localStorage.kutuSifre=s; el.textContent="Giriş yapılıyor…"; api("data").then(function(j){ if(j&&j.ok){S.authed=true;S.data=j;ekCacheYaz(j);render();} else {toast((j&&j.error)||"Giriş başarısız");localStorage.removeItem("kutuKod");render();} }).catch(function(){toast("Bağlantı hatası");render();}); return; }
   if(a==="go"){ S.screen=v; S.sheet=null; S.sd=null; render(); if(v==="home")load(true); return; }
   if(a==="open"){ PHOTOS=[]; S.sheet=v; S.sd=null; if(v==="cariEkle")S.tip="Müşteri"; if(v==="gider")S.giderSekil="Hesaptan"; render(); return; }
   if(a==="close"){ S.sheet=null; S.sd=null; render(); return; }
@@ -319,7 +321,7 @@ document.addEventListener("click",function(e){
   if(a==="kyon"){ S.sd=S.sd||{}; S.sd.yon=v; render(); return; }
   if(a==="aySec"){ S.ay=v; render(); return; }
   if(a==="reloadBtn"){ load(); toast("Yenileniyor…"); return; }
-  if(a==="logout"){ if(!confirm("Çıkış yapılsın mı?"))return; localStorage.removeItem("kutuKod"); localStorage.removeItem("kutuSifre"); S.authed=false; S.data=null; S.screen="home"; render(); return; }
+  if(a==="logout"){ if(!confirm("Çıkış yapılsın mı?"))return; localStorage.removeItem("kutuKod"); localStorage.removeItem("kutuSifre"); try{localStorage.removeItem("ek_cache");}catch(err){} S.authed=false; S.data=null; S.screen="home"; render(); return; }
   if(a==="gsekil"){ S.giderSekil=v; render(); return; }
   if(a==="cariKaydet"){ var ad=$("f_ad").value.trim(); if(!ad){toast("Ad girin");return;} send(el,"cariEkle",{ad:ad,tip:S.tip||"Müşteri",tel:$("f_tel").value.trim()},"cari"); return; }
   if(a==="hareketKaydet"){ var tut=$("f_tut").value; if(!(parseFloat(String(tut).replace(",","."))>0)){toast("Tutar girin");return;} send(el,"hareketEkle",{cari:S.sd.cari,yon:S.sd.yon,tutar:tut,tarih:($("f_tar")?$("f_tar").value:""),yontem:$("f_yon").value.trim(),aciklama:$("f_ack").value.trim(),photos:PHOTOS.slice()},(S.cariSel?"cariDetay":"cari")); return; }
@@ -331,7 +333,7 @@ function send(btn,action,data,goScreen,msg){
   api(action,data).then(function(j){ S.busy=false; if(j&&j.ok){ toast(msg||"Kaydedildi · onaya gönderildi ✓"); PHOTOS=[]; S.sheet=null; S.sd=null; if(goScreen)S.screen=goScreen; api("data").then(function(r){ if(r&&r.ok)S.data=r; render(); }); } else { btn.textContent=old; btn.style.opacity="1"; toast((j&&j.error)||"İşlem başarısız"); } }).catch(function(){ S.busy=false; btn.textContent=old; btn.style.opacity="1"; toast("Bağlantı hatası"); });
 }
 /* ---------- init ---------- */
-if(localStorage.kutuKod && localStorage.kutuSifre){ S.authed=true; load(); } else { render(); }
+if(localStorage.kutuKod && localStorage.kutuSifre){ S.authed=true; var _c=ekCacheOku(); if(_c){ S.data=_c; render(); } load(!!_c); } else { render(); }
 </script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 </body>
