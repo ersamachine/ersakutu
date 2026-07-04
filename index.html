@@ -310,7 +310,7 @@ document.addEventListener("click",function(e){
   if(a==="open"){ PHOTOS=[]; S.sheet=v; S.sd=null; if(v==="cariEkle")S.tip="Müşteri"; if(v==="gider")S.giderSekil="Hesaptan"; render(); return; }
   if(a==="close"){ S.sheet=null; S.sd=null; render(); return; }
   if(a==="apps"){ S.sheet="apps"; S.sd=null; render(); return; }
-  if(a==="goApp"){ location.href=v; return; }
+  if(a==="goApp"){ try{ if(v.indexOf("portal")>=0&&S.data&&S.data.portalGiris){ localStorage.setItem("ersa_portal_auth",JSON.stringify({kod:S.data.portalGiris.kod,sifre:S.data.portalGiris.sifre})); } }catch(_e){} location.href=v; return; }
   if(a==="tip"){ document.getElementById("tipM").classList.toggle("on",v==="Müşteri"); document.getElementById("tipM").classList.toggle("g",v==="Müşteri"); document.getElementById("tipT").classList.toggle("on",v==="Tedarikçi"); S.tip=v; return; }
   if(a==="cariAc"){ PHOTOS=[]; S.sheet="hareket"; S.sd={cari:v,yon:"Giriş"}; render(); return; }
   if(a==="cariDetay"){ S.cariSel=v; S.screen="cariDetay"; S.sheet=null; S.sd=null; render(); return; }
